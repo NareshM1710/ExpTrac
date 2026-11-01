@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f6f7fb">
+  <title>Ledgerly | Personal expense tracker</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js" defer></script>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+  <main id="lock-screen" class="lock-screen" hidden>
+    <div class="lock-card">
+      <div class="brand-mark"><span>✦</span> ledgerly</div>
+      <div class="lock-avatar" id="lock-avatar">N</div>
+      <h2>Hi, <span id="lock-name">there</span></h2>
+      <p class="lock-user" id="lock-username"></p>
+      <div class="pin-dots" id="pin-dots"></div>
+      <p class="form-error" id="lock-error" role="alert"></p>
+      <div class="pin-pad" aria-label="PIN keypad">
+        <button type="button" data-pin="1">1</button><button type="button" data-pin="2">2</button><button type="button" data-pin="3">3</button>
+        <button type="button" data-pin="4">4</button><button type="button" data-pin="5">5</button><button type="button" data-pin="6">6</button>
+        <button type="button" data-pin="7">7</button><button type="button" data-pin="8">8</button><button type="button" data-pin="9">9</button>
+        <button type="button" class="pin-alt" data-pin="back" aria-label="Delete">⌫</button><button type="button" data-pin="0">0</button><button type="button" class="pin-alt" data-pin="ok" aria-label="Unlock">✓</button>
+      </div>
+      <button class="link-button" id="lock-switch" type="button">Use a different profile</button>
+    </div>
+  </main>
+  <main id="auth-screen" class="auth-screen" hidden>
+    <section class="auth-art" aria-label="Ledgerly introduction">
+      <div class="brand-mark"><span>✦</span> ledgerly</div>
+      <div class="auth-copy"><p class="eyebrow">Money, made visible</p><h1>Your money has a story. Make it legible.</h1><p>Track the everyday tea, the monthly rent, and everything between. Shared locally with the people you trust.</p></div>
+      <div class="art-stat"><strong>₹ 48,280</strong><span>sample monthly savings</span></div>
+    </section>
+    <section class="auth-panel">
+      <div class="auth-heading"><div class="brand-mark mobile-brand"><span>✦</span> ledgerly</div><p class="eyebrow" id="auth-eyebrow">Welcome back</p><h2 id="auth-title">Your finances, in one calm place.</h2><p id="auth-subtitle">Sign in to continue where you left off.</p></div>
+      <form id="auth-form" class="stack-form">
+        <label id="name-field" hidden>Display name<input id="auth-name" autocomplete="name" placeholder="e.g. Priya" maxlength="40"></label>
+        <label>Username<input id="auth-username" autocomplete="username" placeholder="e.g. NA27" maxlength="20" required></label>
+        <label>PIN<input id="auth-pin" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="current-password" placeholder="4 digits minimum" minlength="4" maxlength="12" required></label>
+        <label id="confirm-field" hidden>Confirm PIN<input id="auth-confirm" type="password" inputmode="numeric" pattern="[0-9]*" autocomplete="new-password" minlength="4" maxlength="12"></label>
+        <p id="auth-error" class="form-error" role="alert"></p>
+        <button class="button primary wide" type="submit" id="auth-submit">Sign in <span>↗</span></button>
+      </form>
+      <div class="auth-switch"><span id="switch-copy">New here?</span> <button class="link-button" id="auth-switch" type="button">Create an account</button></div>
+      <p class="security-note">Your password never leaves this browser. Local encryption uses PBKDF2 + AES-GCM.</p>
+    </section>
+  </main>
+
+  <main id="app-shell" hidden>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand-mark"><span>✦</span> ledgerly</div>
+      <nav class="main-nav" aria-label="Main navigation">
+        <button class="nav-item active" data-view="overview"><span>◈</span> Overview</button>
+        <button class="nav-item" data-view="transactions"><span>↕</span> Transactions</button>
+        <button class="nav-item" data-view="budgets"><span>◒</span> Budgets</button>
+        <button class="nav-item" data-view="insights"><span>✧</span> Insights</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-view="settings"><span>⚙</span> Settings</button>
+        <div class="profile-mini"><div class="avatar" id="profile-avatar">P</div><div><strong id="profile-name">Profile</strong><span id="profile-email">email</span></div><button class="icon-button" id="logout-btn" title="Log out" aria-label="Log out">↪</button></div>
+      </div>
+    </aside>
+    <section class="app-content">
+      <header class="topbar"><button class="icon-button mobile-menu" id="menu-btn" aria-label="Open menu">☰</button><div><p class="eyebrow">PERSONAL FINANCE / <span id="top-view-name">OVERVIEW</span></p><h1 id="page-title">Good morning, <span id="greeting-name">there</span> <span class="wave">✦</span></h1></div><div class="top-actions"><button class="icon-button mobile-lock" id="lock-icon-btn" title="Lock app" aria-label="Lock app">🔒</button><button class="icon-button theme-toggle" id="theme-toggle" title="Toggle theme" aria-label="Toggle theme">☾</button><button class="button outline lock-btn" id="lock-btn">⌑ Lock app</button><button class="button primary add-top" data-open-expense>+ Add expense</button></div></header>
+      <div id="view-container"></div>
+    </section>
+    <nav class="tab-bar" aria-label="Bottom navigation">
+      <button class="tab-item active" data-view="overview"><span>◈</span>Home</button>
+      <button class="tab-item" data-view="transactions"><span>↕</span>Activity</button>
+      <button class="tab-add" data-open-expense aria-label="Add expense">+</button>
+      <button class="tab-item" data-view="budgets"><span>◒</span>Budgets</button>
+      <button class="tab-item" data-view="settings"><span>⚙</span>More</button>
+    </nav>
+  </main>
+  <button class="fab" data-open-expense aria-label="Add expense">+ <span>Add expense</span></button>
+
+  <div class="modal-backdrop" id="modal-backdrop" hidden><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title"></section></div>
+  
+  <template id="keyboard-shortcuts-template">
+    <div class="modal-header"><div><p class="eyebrow">QUICK TIPS</p><h2 id="modal-title">Keyboard Shortcuts</h2></div><button type="button" class="icon-button close-modal" aria-label="Close">×</button></div>
+    <div style="padding:16px;display:grid;gap:12px">
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">N</kbd><span>Add new expense</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">Ctrl+R</kbd><span>Quick repeat last expense</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">O</kbd><span>Go to Overview</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">T</kbd><span>Go to Transactions</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">B</kbd><span>Go to Budgets</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">I</kbd><span>Go to Insights</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">/</kbd><span>Search transactions</span></div>
+      <div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center"><kbd style="padding:4px 8px;background:#edf0f5;border-radius:4px">Esc</kbd><span>Close modal</span></div>
+    </div>
+  </template>
+
+  <template id="expense-form-template">
+    <form id="expense-form" class="modal-form"><div class="modal-header"><div><p class="eyebrow">QUICK ENTRY</p><h2 id="modal-title">Add expense</h2></div><div><button type="button" class="link-button" id="repeat-last">Repeat last</button><button type="button" class="icon-button close-modal" aria-label="Close">×</button></div></div>
+      <div class="type-toggle"><label><input type="radio" name="entry-type" value="expense" checked> Expense</label><label><input type="radio" name="entry-type" value="income"> Income</label></div>
+      <div class="form-grid"><label class="amount-field">Amount <span class="currency-symbol">₹</span><input name="amount" type="number" min="0.01" step="0.01" required placeholder="0.00" autofocus></label><label>Date<input name="date" type="date" required></label></div>
+      <div class="chip-row" id="category-chips"></div><label>Category<select name="category" id="expense-category" required></select></label>
+      <div class="form-grid"><label>Payment method<select name="payment"><option>UPI</option><option>Card</option><option>Cash</option><option>Bank</option></select></label><label>Merchant / description<input name="merchant" list="merchant-suggestions" required placeholder="e.g. Blue Tokai"><datalist id="merchant-suggestions"></datalist></label></div>
+      <label>Notes <textarea name="notes" rows="2" placeholder="Optional context"></textarea></label><label>Tags <input name="tags" placeholder="work, weekend"></label>
+      <details class="advanced-entry"><summary>Split or repeat this</summary><div class="form-grid"><label>Who paid<input name="paidBy" placeholder="You"></label><label>Split with<input name="splitWith" placeholder="Friend names, comma separated"></label></div><div class="form-grid"><label>Repeat<select name="recurrence"><option value="none">Does not repeat</option><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="yearly">Yearly</option></select></label><label>Repeat until<input name="repeatUntil" type="date"></label></div></details>
+      <div class="modal-actions"><button type="button" class="button ghost close-modal">Cancel</button><button class="button primary" type="submit">Save entry <span>↗</span></button></div>
+    </form>
+  </template>
+</body>
+</html>

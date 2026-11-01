@@ -1,0 +1,13 @@
+{
+  "name": "Ledgerly Expense Tracker",
+  "short_name": "Ledgerly",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#f6f7fb",
+  "theme_color": "#4f6df5",
+  "description": "A private, local-first personal expense tracker.",
+  "shortcuts": [
+    { "name": "Add expense", "short_name": "Add", "description": "Log today's spend", "url": "./index.html?action=add" }
+  ],
+  "icons": []
+}
